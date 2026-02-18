@@ -1,58 +1,46 @@
 # Mobile Store Management System
 
-## Project Overview
-The Mobile Store Management System is a full-stack web application designed to help mobile shop owners manage their daily business operations digitally. It allows management of inventory, sales, customers, suppliers, and reports in one system.
-
-The system reduces manual work, prevents inventory mistakes, and provides insights into sales and profits.
+## Project Summary
+The Mobile Store Management System is a web application designed to digitize the operations of a mobile phone shop. It will help manage inventory, handle sales & billing, track customers and suppliers, and produce business reports. The system improves accuracy and efficiency compared to manual records and supports multi-user access with roles (Admin, Staff).
 
 ## Scope
-The system will support:
+- Inventory & stock control for mobiles & accessories
+- Sales & invoice generation
+- Customer data management
+- Supplier and purchase order management
+- Reports (daily sales, stock levels, profit/loss)
+- Role-based authentication and access control
 
-• Product inventory management  
-• Sales & billing  
-• Customer management  
-• Supplier management  
-• Reporting & analytics  
-• Role-based access (Admin/Staff)
+## Core Features
+1. **User Authentication**
+   - Admin and staff login
+   - Role-based dashboards
 
-## Key Features
+2. **Inventory Management**
+   - Add/update/delete products
+   - Track stock quantities
+   - Auto-update stock on sales/purchase
 
-### 1. User Management
-- Admin and Staff roles
-- Login/logout authentication
-- Role-based access control
+3. **Sales & Billing**
+   - Create sales invoices
+   - Tax/GST support
+   - Manage bill history
 
-### 2. Inventory Management
-- Add/update/delete mobile phones & accessories
-- Track stock quantity
-- Low-stock alerts
+4. **Customer Management**
+   - Store customer info
+   - View purchase history
 
-### 3. Sales & Billing
-- Create bills/invoices
-- Auto price calculation
-- GST/tax calculation
-- Generate receipt
+5. **Supplier & Purchases**
+   - Manage supplier profiles
+   - Create purchase entries and update stock
 
-### 4. Customer Management
-- Store customer details
-- View purchase history
+6. **Reports**
+   - Sales reports (daily/monthly)
+   - Stock reports
+   - Profit and loss summaries
 
-### 5. Supplier Management
-- Add/manage suppliers
-- Record purchase orders
-
-### 6. Reports
-- Daily/monthly sales reports
-- Profit reports
-- Top-selling products
-
-## Tech Stack (Proposed)
-Frontend: React  
-Backend: Node.js + Express  
-Database: MongoDB / MySQL  
-Auth: JWT Authentication  
-
-## Future Enhancements
-- Barcode scanning
-- Online ordering integration
-- AI-based demand prediction
+## Technology Stack
+- **Frontend:** React (alternatively HTML/CSS/Bootstrap)
+- **Backend:** Node.js + Express
+- **Database:** MySQL (recommended) or MongoDB
+- **Authentication:** JWT
