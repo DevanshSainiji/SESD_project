@@ -3,18 +3,13 @@
 ```mermaid
 flowchart TD
 
+User --> Login
+Login --> Dashboard
+
+Dashboard --> ViewInventory
+Dashboard --> CreateSale
+Dashboard --> ManageProducts
+Dashboard --> ViewReports
+
 Admin --> ManageUsers
-Admin --> ViewReports
-Admin --> ManageInventory
 Admin --> ManageSuppliers
-
-Staff --> CreateBill
-Staff --> ManageCustomers
-Staff --> ViewInventory
-
-ManageInventory --> AddProduct
-ManageInventory --> UpdateProduct
-ManageInventory --> DeleteProduct
-
-CreateBill --> GenerateInvoice
-CreateBill --> UpdateStock
