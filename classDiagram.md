@@ -1,4 +1,8 @@
-mermaid
+
+```md
+# Class Diagram
+
+```mermaid
 classDiagram
 
 class User {
