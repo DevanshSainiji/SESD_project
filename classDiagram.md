@@ -1,3 +1,4 @@
+![Class Diagram](../class_diagram.png)
 
 ```md
 # Class Diagram

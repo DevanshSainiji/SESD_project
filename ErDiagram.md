@@ -1,3 +1,4 @@
+![ER Diagram](../er_diagram.png)
 
 ```md
 # ER Diagram
