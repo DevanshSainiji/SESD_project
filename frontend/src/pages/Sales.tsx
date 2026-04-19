@@ -123,53 +123,54 @@ export const Sales: React.FC = () => {
 
       {/* Cart / Invoice Summary */}
       <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 h-fit sticky top-8">
-        <div ref={invoiceRef} className="p-4 bg-[#1e293b] rounded-xl -mx-4 -mt-4 mb-4">
+        <div ref={invoiceRef} className="p-4 rounded-xl -mx-4 -mt-4 mb-4" style={{ backgroundColor: '#1e293b', color: '#ffffff' }}>
           <div className="flex items-center gap-3 mb-6">
-            <ShoppingCart className="text-blue-500" />
-            <h3 className="text-xl font-semibold">Checkout Summary</h3>
+            <ShoppingCart style={{ color: '#3b82f6' }} />
+            <h3 className="text-xl font-semibold" style={{ color: '#ffffff' }}>Checkout Summary</h3>
           </div>
 
         <div className="space-y-4 mb-8">
           {cart.map(item => (
-            <div key={item.product.id} className="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-800/40 border border-slate-700/50">
+            <div key={item.product.id} className="flex items-center justify-between gap-4 p-3 rounded-xl border" style={{ backgroundColor: '#1e293b', borderColor: '#334155' }}>
               <div className="flex-1">
-                <p className="font-medium text-sm">{item.product.name}</p>
-                <p className="text-xs text-slate-500">${item.product.price} / unit</p>
+                <p className="font-medium text-sm" style={{ color: '#ffffff' }}>{item.product.name}</p>
+                <p className="text-xs" style={{ color: '#94a3b8' }}>${item.product.price} / unit</p>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={() => updateQuantity(item.product.id, -1)} className="p-1 hover:bg-slate-700 rounded"><Minus size={14} /></button>
-                <span className="w-8 text-center font-bold">{item.quantity}</span>
-                <button onClick={() => updateQuantity(item.product.id, 1)} className="p-1 hover:bg-slate-700 rounded"><Plus size={14} /></button>
+                <button onClick={() => updateQuantity(item.product.id, -1)} className="p-1 rounded" style={{ backgroundColor: '#334155' }}><Minus size={14} style={{ color: '#ffffff' }} /></button>
+                <span className="w-8 text-center font-bold" style={{ color: '#ffffff' }}>{item.quantity}</span>
+                <button onClick={() => updateQuantity(item.product.id, 1)} className="p-1 rounded" style={{ backgroundColor: '#334155' }}><Plus size={14} style={{ color: '#ffffff' }} /></button>
               </div>
-              <p className="w-20 text-right font-bold text-sm">${(item.product.price * item.quantity).toFixed(2)}</p>
+              <p className="w-20 text-right font-bold text-sm" style={{ color: '#ffffff' }}>${(item.product.price * item.quantity).toFixed(2)}</p>
               <button 
                 onClick={() => removeFromCart(item.product.id)}
-                className="text-slate-500 hover:text-red-500 transition-colors ml-2"
+                className="ml-2"
+                style={{ color: '#ef4444' }}
               >
                 <Trash2 size={16} />
               </button>
             </div>
           ))}
           {cart.length === 0 && (
-            <div className="py-12 text-center text-slate-500">
+            <div className="py-12 text-center" style={{ color: '#64748b' }}>
               <ShoppingCart size={40} className="mx-auto mb-3 opacity-10" />
               <p>Your cart is empty.</p>
             </div>
           )}
         </div>
 
-        <div className="border-t border-slate-700 pt-6 space-y-3">
-          <div className="flex justify-between text-slate-400">
+        <div className="pt-6 space-y-3" style={{ borderTop: '1px solid #334155' }}>
+          <div className="flex justify-between" style={{ color: '#cbd5e1' }}>
             <span>Subtotal</span>
             <span>${totalAmount.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between" style={{ color: '#cbd5e1' }}>
             <span>Tax (GST 18%)</span>
             <span>${(totalAmount * 0.18).toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-xl font-bold pt-3 border-t border-slate-800">
+          <div className="flex justify-between text-xl font-bold pt-3" style={{ borderTop: '1px solid #0f172a', color: '#10b981' }}>
             <span>Total</span>
-            <span className="text-emerald-500">${(totalAmount * 1.18).toFixed(2)}</span>
+            <span>${(totalAmount * 1.18).toFixed(2)}</span>
           </div>
         </div>
         </div>
