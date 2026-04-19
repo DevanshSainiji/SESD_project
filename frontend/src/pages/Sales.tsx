@@ -1,11 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ProductService, SaleService, type Product } from '../services/api';
 import { ShoppingCart, Plus, Minus, Trash2, CheckCircle2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 export const Sales: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<{ product: Product; quantity: number }[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const invoiceRef = useRef<HTMLDivElement>(null);
+
+  const downloadInvoice = async () => {
+    if (!invoiceRef.current) return;
+    setIsGeneratingPdf(true);
+    try {
+      const canvas = await html2canvas(invoiceRef.current, { 
+        scale: 2, 
+        backgroundColor: '#1e293b',
+        logging: false
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Invoice_${new Date().getTime()}.pdf`);
+    } catch (error: any) {
+      console.error("Failed to generate PDF:", error);
+      alert("PDF Generation Failed: " + (error.message || String(error)));
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   useEffect(() => {
     ProductService.getProducts().then(items => setProducts(items.filter(p => p.stock > 0)));
@@ -52,6 +80,10 @@ export const Sales: React.FC = () => {
           price: item.product.price
         }))
       });
+      
+      // Generate PDF BEFORE showing success state to avoid mid-render DOM disruption
+      await downloadInvoice();
+      
       setIsSuccess(true);
       setCart([]);
       setTimeout(() => setIsSuccess(false), 3000);
@@ -91,10 +123,11 @@ export const Sales: React.FC = () => {
 
       {/* Cart / Invoice Summary */}
       <div className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 h-fit sticky top-8">
-        <div className="flex items-center gap-3 mb-6">
-          <ShoppingCart className="text-blue-500" />
-          <h3 className="text-xl font-semibold">Checkout Summary</h3>
-        </div>
+        <div ref={invoiceRef} className="p-4 bg-[#1e293b] rounded-xl -mx-4 -mt-4 mb-4">
+          <div className="flex items-center gap-3 mb-6">
+            <ShoppingCart className="text-blue-500" />
+            <h3 className="text-xl font-semibold">Checkout Summary</h3>
+          </div>
 
         <div className="space-y-4 mb-8">
           {cart.map(item => (
@@ -139,13 +172,14 @@ export const Sales: React.FC = () => {
             <span className="text-emerald-500">${(totalAmount * 1.18).toFixed(2)}</span>
           </div>
         </div>
+        </div>
 
         <button 
           onClick={handleSubmit}
-          disabled={cart.length === 0}
+          disabled={cart.length === 0 || isGeneratingPdf}
           className="w-full mt-8 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2"
         >
-          {isSuccess ? <CheckCircle2 /> : "Complete Sale & Print Invoice"}
+          {isSuccess ? <CheckCircle2 /> : isGeneratingPdf ? "Generating PDF..." : "Complete Sale & Print Invoice"}
         </button>
 
         {isSuccess && (
