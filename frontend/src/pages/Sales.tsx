@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ProductService, SaleService, type Product } from '../services/api';
 import { ShoppingCart, Plus, Minus, Trash2, CheckCircle2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+import { useReactToPrint } from 'react-to-print';
 
 export const Sales: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,29 +10,12 @@ export const Sales: React.FC = () => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  const downloadInvoice = async () => {
-    if (!invoiceRef.current) return;
-    setIsGeneratingPdf(true);
-    try {
-      const canvas = await html2canvas(invoiceRef.current, { 
-        scale: 2, 
-        backgroundColor: '#1e293b',
-        logging: false
-      });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Invoice_${new Date().getTime()}.pdf`);
-    } catch (error: any) {
-      console.error("Failed to generate PDF:", error);
-      alert("PDF Generation Failed: " + (error.message || String(error)));
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
+  const downloadInvoice = useReactToPrint({
+    contentRef: invoiceRef,
+    documentTitle: `Invoice_${new Date().getTime()}`,
+    onBeforePrint: async () => setIsGeneratingPdf(true),
+    onAfterPrint: () => setIsGeneratingPdf(false),
+  });
 
   useEffect(() => {
     ProductService.getProducts().then(items => setProducts(items.filter(p => p.stock > 0)));
