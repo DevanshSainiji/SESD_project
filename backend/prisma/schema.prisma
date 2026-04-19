@@ -1,0 +1,83 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+  role     String
+  sales    Sale[]
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String
+  brand         String
+  price         Float
+  stock         Int
+  saleItems     SaleItem[]
+  purchaseItems PurchaseItem[]
+}
+
+model Customer {
+  id    Int     @id @default(autoincrement())
+  name  String
+  phone String?
+  email String?
+  sales Sale[]
+}
+
+model Supplier {
+  id        Int        @id @default(autoincrement())
+  name      String
+  contact   String?
+  email     String?
+  purchases Purchase[]
+}
+
+model Purchase {
+  id          Int            @id @default(autoincrement())
+  date        DateTime       @default(now())
+  supplier    Supplier       @relation(fields: [supplierId], references: [id])
+  supplierId  Int
+  totalCost   Float
+  items       PurchaseItem[]
+}
+
+model PurchaseItem {
+  id         Int      @id @default(autoincrement())
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  purchaseId Int
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+  quantity   Int
+  cost       Float
+}
+
+model Sale {
+  id          Int        @id @default(autoincrement())
+  date        DateTime   @default(now())
+  customer    Customer   @relation(fields: [customerId], references: [id])
+  customerId  Int
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  totalAmount Float
+  items       SaleItem[]
+}
+
+model SaleItem {
+  id        Int     @id @default(autoincrement())
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  saleId    Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  price     Float
+}
