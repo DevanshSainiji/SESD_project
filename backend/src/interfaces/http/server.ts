@@ -23,6 +23,7 @@ const saleController = new SaleController(saleService);
 // --- Routes ---
 app.get('/api/products', productController.getAllProducts);
 app.post('/api/products', productController.createProduct);
+app.put('/api/products/:id', productController.updateProduct);
 app.patch('/api/products/:id/stock', productController.updateStock);
 app.get('/api/sales', saleController.getAllSales);
 app.post('/api/sales', saleController.processSale);

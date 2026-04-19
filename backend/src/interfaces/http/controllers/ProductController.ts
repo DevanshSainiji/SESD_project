@@ -25,6 +25,18 @@ export class ProductController {
     }
   };
 
+  public updateProduct = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { name, brand, price, stock } = req.body;
+      const product = DomainFactory.createProduct(name, brand, price, stock, Number(id));
+      const updatedProduct = await this.productRepository.save(product);
+      res.json(updatedProduct);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+
   public updateStock = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;

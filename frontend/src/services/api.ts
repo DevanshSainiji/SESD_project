@@ -26,6 +26,7 @@ export interface Sale {
 export const ProductService = {
   getProducts: () => api.get<Product[]>('/products').then(res => res.data),
   createProduct: (product: Omit<Product, 'id'>) => api.post<Product>('/products', product).then(res => res.data),
+  updateProduct: (id: number, product: Omit<Product, 'id'>) => api.put<Product>(`/products/${id}`, product).then(res => res.data),
 };
 
 export const SaleService = {

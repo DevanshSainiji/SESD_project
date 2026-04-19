@@ -1,14 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { ProductService, type Product } from '../services/api';
-import { Plus, Search, Edit2, Trash2, Package } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Package, X } from 'lucide-react';
 
 export const Inventory: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    brand: '',
+    price: '',
+    stock: ''
+  });
+
+  const fetchProducts = async () => {
+    try {
+      const data = await ProductService.getProducts();
+      setProducts(data);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+    }
+  };
 
   useEffect(() => {
-    ProductService.getProducts().then(setProducts);
+    fetchProducts();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const productPayload = {
+        name: formData.name,
+        brand: formData.brand,
+        price: parseFloat(formData.price),
+        stock: parseInt(formData.stock)
+      };
+
+      if (editingProduct) {
+        await ProductService.updateProduct(editingProduct.id, productPayload);
+      } else {
+        await ProductService.createProduct(productPayload);
+      }
+      
+      setIsModalOpen(false);
+      setEditingProduct(null);
+      setFormData({ name: '', brand: '', price: '', stock: '' });
+      fetchProducts();
+    } catch (err) {
+      console.error('Failed to save product:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openAddModal = () => {
+    setEditingProduct(null);
+    setFormData({ name: '', brand: '', price: '', stock: '' });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name,
+      brand: product.brand,
+      price: product.price.toString(),
+      stock: product.stock.toString()
+    });
+    setIsModalOpen(true);
+  };
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -28,11 +91,107 @@ export const Inventory: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+        <button 
+          onClick={openAddModal}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+        >
           <Plus size={18} />
           <span>Add Product</span>
         </button>
       </div>
+
+      {/* Add Product Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="relative w-full max-w-md bg-[#1e293b] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-800/50">
+              <h3 className="text-lg font-semibold">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
+              <button 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingProduct(null);
+                }} 
+                className="p-1 hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <X size={20} className="text-slate-400" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-400">Product Name</label>
+                <input 
+                  required
+                  type="text" 
+                  placeholder="e.g. iPhone 15 Pro"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-400">Brand</label>
+                <input 
+                  required
+                  type="text" 
+                  placeholder="e.g. Apple"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
+                  value={formData.brand}
+                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-400">Price ($)</label>
+                  <input 
+                    required
+                    type="number" 
+                    step="0.01"
+                    placeholder="0.00"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-400">Stock</label>
+                  <input 
+                    required
+                    type="number" 
+                    placeholder="0"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingProduct(null);
+                  }}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 font-medium hover:bg-slate-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-600/20"
+                >
+                  {isSubmitting ? 'Saving...' : 'Save Product'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="bg-[#1e293b] border border-slate-700 rounded-2xl overflow-hidden">
         <table className="w-full text-left border-collapse">
@@ -72,7 +231,10 @@ export const Inventory: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-400 transition-colors">
+                    <button 
+                      onClick={() => openEditModal(product)}
+                      className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-blue-400 transition-colors"
+                    >
                       <Edit2 size={16} />
                     </button>
                     <button className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-red-400 transition-colors">
